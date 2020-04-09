@@ -10,5 +10,5 @@ class AudioCrossfader : public AudioStream {
 
   private:
     float gainOffset;
-	  audio_block_t* inputQueueArray[4];
+    audio_block_t* inputQueueArray[4];
 };
