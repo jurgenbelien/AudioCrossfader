@@ -1,10 +1,5 @@
 #include "AudioCrossfader.h"
 
-void AudioCrossfader::init() {
-  pinMode(pin, INPUT);
-  update();
-}
-
 /**
  * Minimally modified versions of static functions found in
  * Teensy Audio Library's AudioMixer4
@@ -46,21 +41,17 @@ void AudioCrossfader::update() {
   audio_block_t* outLeft = NULL;
   audio_block_t* outRight = NULL;
 
-  float position = (float) analogRead(pin) / 1024.0f;
-
   for (uint8_t channel = 0; channel < 4; channel++) {
     audio_block_t*& out = (channel % 2) ? outLeft : outRight;
     if (!out) {
       out = receiveWritable(channel);
       if (out) {
-        // First two passes start with side A, drops level by crossfade
-        applyGain(out->data, 1.0f - position);
+        applyGain(out->data, 0.5f - gainOffset);
       }
     } else {
       in = receiveReadOnly(channel);
       if (in) {
-        // Second two passes add B * crossfade position to A * 1 - crossfade position;
-        applyGainThenAdd(out->data, in->data, position);
+        applyGainThenAdd(out->data, in->data, 0.5f + gainOffset);
         release(in);
       }
     }
@@ -78,3 +69,6 @@ void AudioCrossfader::update() {
   }
 }
 
+void AudioCrossfader::set(float balance) {
+  gainOffset = balance / 2.0f;
+}

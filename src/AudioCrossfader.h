@@ -3,13 +3,12 @@
 
 class AudioCrossfader : public AudioStream {
   public:
-    AudioCrossfader(int pin) :
-      AudioStream(4, inputQueueArray),
-      pin(pin) {};
-    void init();
+    AudioCrossfader() : AudioStream(4, inputQueueArray) {};
     virtual void update();
+    // -1.0f for A, +1.0f for B, 0.0f is equal mix
+    void set(float balance);
 
   private:
-    const int pin;
+    float gainOffset;
 	  audio_block_t* inputQueueArray[4];
 };
